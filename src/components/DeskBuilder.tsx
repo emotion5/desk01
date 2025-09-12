@@ -9,12 +9,12 @@ export default function DeskBuilder() {
   const [dimensions, setDimensions] = useState<DeskDimensions>(DEFAULT_DIMENSIONS);
 
   return (
-    <div style={{ display: 'flex', gap: '20px', padding: '20px' }}>
+    <div className="grid-2col">
+      <ThreeDViewer dimensions={dimensions} />
       <ControlPanel
         dimensions={dimensions}
         onDimensionChange={setDimensions}
       />
-      <ThreeDViewer dimensions={dimensions} />
     </div>
   );
 }

@@ -63,21 +63,40 @@ export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
   };
 
   return (
-    <div style={{ width: '400px', height: '340px', border: '1px solid #ccc' }}>
-      <h4 style={{ margin: '10px', textAlign: 'center' }}>
-        3D View - {dimensions.width}×{dimensions.depth}×{dimensions.height}cm
-      </h4>
-      <div style={{ width: '100%', height: '260px' }}>
-        <Canvas camera={{ position: [150, 100, 150], fov: 50 }}>
-          {/* 조명 */}
-          <ambientLight intensity={0.4} />
+    <div className="glass-card" style={{ overflow: 'hidden' }}>
+      <div style={{ 
+        padding: 'var(--spacing-lg)', 
+        borderBottom: '1px solid var(--color-border)',
+        background: 'var(--color-surface-elevated)'
+      }}>
+        <h3 className="title-medium" style={{ marginBottom: 'var(--spacing-xs)' }}>
+          3D Preview
+        </h3>
+        <p className="caption">
+          {dimensions.width} × {dimensions.depth} × {dimensions.height} cm
+        </p>
+      </div>
+      
+      <div style={{ 
+        width: '100%', 
+        height: '400px',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        position: 'relative',
+        borderRadius: '0 0 var(--radius-lg) var(--radius-lg)'
+      }}>
+        <Canvas 
+          camera={{ position: [150, 100, 150], fov: 50 }}
+        >
+          {/* 더 부드러운 조명 */}
+          <ambientLight intensity={0.6} />
           <directionalLight 
             position={[100, 100, 50]} 
-            intensity={1} 
+            intensity={0.8} 
             castShadow 
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
           />
+          <pointLight position={[-50, 50, 50]} intensity={0.3} />
           
           {/* 3D 책상 모델 */}
           <DeskModel dimensions={dimensions} />
@@ -89,27 +108,27 @@ export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
             enableRotate={true}
             minDistance={50}
             maxDistance={500}
+            enableDamping={true}
+            dampingFactor={0.05}
           />
         </Canvas>
       </div>
-      <div style={{ textAlign: 'center', margin: '10px' }}>
+      
+      <div style={{ 
+        padding: 'var(--spacing-lg)',
+        background: 'var(--color-surface-elevated)',
+        borderTop: '1px solid var(--color-border)'
+      }}>
         <button 
           onClick={handleExportGLB}
-          style={{ 
-            padding: '8px 16px', 
-            backgroundColor: '#28a745', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
+          className="btn-primary"
+          style={{ width: '100%', marginBottom: 'var(--spacing-sm)' }}
         >
-          GLB 다운로드
+          Export as GLB
         </button>
-        <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-          Blender, Unity, 3D 프린팅 지원
-        </div>
+        <p className="caption" style={{ textAlign: 'center' }}>
+          Compatible with Blender, Unity, and 3D printing
+        </p>
       </div>
     </div>
   );

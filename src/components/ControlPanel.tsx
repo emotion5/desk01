@@ -7,6 +7,57 @@ interface ControlPanelProps {
   onDimensionChange: (dimensions: DeskDimensions) => void;
 }
 
+interface SliderControlProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  unit: string;
+  onChange: (value: number) => void;
+}
+
+function SliderControl({ label, value, min, max, unit, onChange }: SliderControlProps) {
+  return (
+    <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'baseline',
+        marginBottom: 'var(--spacing-sm)'
+      }}>
+        <label className="body-medium" style={{ color: 'var(--color-text-primary)' }}>
+          {label}
+        </label>
+        <span style={{ 
+          fontWeight: 'var(--font-weight-semibold)',
+          fontSize: '18px',
+          color: 'var(--color-text-primary)'
+        }}>
+          {value}{unit}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        className="apple-slider"
+        style={{ marginBottom: 'var(--spacing-xs)' }}
+      />
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        fontSize: '13px',
+        color: 'var(--color-text-secondary)'
+      }}>
+        <span>{min}{unit}</span>
+        <span>{max}{unit}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ControlPanel({ dimensions, onDimensionChange }: ControlPanelProps) {
   const handleSliderChange = (key: keyof DeskDimensions, value: number) => {
     onDimensionChange({
@@ -20,56 +71,44 @@ export default function ControlPanel({ dimensions, onDimensionChange }: ControlP
   };
 
   return (
-    <div style={{ padding: '20px', border: '1px solid #ccc', width: '300px' }}>
-      <h3>책상 치수 조정</h3>
+    <div className="glass-card-elevated" style={{ padding: 'var(--spacing-xl)' }}>
+      <h2 className="title-medium" style={{ marginBottom: 'var(--spacing-lg)' }}>
+        Customize Your Desk
+      </h2>
       
-      <div style={{ marginBottom: '20px' }}>
-        <label>
-          폭 (Width): {dimensions.width}cm
-          <br />
-          <input
-            type="range"
-            min={DIMENSION_LIMITS.width.min}
-            max={DIMENSION_LIMITS.width.max}
-            value={dimensions.width}
-            onChange={(e) => handleSliderChange('width', parseInt(e.target.value))}
-            style={{ width: '100%' }}
-          />
-        </label>
-      </div>
+      <SliderControl
+        label="Width"
+        value={dimensions.width}
+        min={DIMENSION_LIMITS.width.min}
+        max={DIMENSION_LIMITS.width.max}
+        unit="cm"
+        onChange={(value) => handleSliderChange('width', value)}
+      />
 
-      <div style={{ marginBottom: '20px' }}>
-        <label>
-          깊이 (Depth): {dimensions.depth}cm
-          <br />
-          <input
-            type="range"
-            min={DIMENSION_LIMITS.depth.min}
-            max={DIMENSION_LIMITS.depth.max}
-            value={dimensions.depth}
-            onChange={(e) => handleSliderChange('depth', parseInt(e.target.value))}
-            style={{ width: '100%' }}
-          />
-        </label>
-      </div>
+      <SliderControl
+        label="Depth"
+        value={dimensions.depth}
+        min={DIMENSION_LIMITS.depth.min}
+        max={DIMENSION_LIMITS.depth.max}
+        unit="cm"
+        onChange={(value) => handleSliderChange('depth', value)}
+      />
 
-      <div style={{ marginBottom: '20px' }}>
-        <label>
-          높이 (Height): {dimensions.height}cm
-          <br />
-          <input
-            type="range"
-            min={DIMENSION_LIMITS.height.min}
-            max={DIMENSION_LIMITS.height.max}
-            value={dimensions.height}
-            onChange={(e) => handleSliderChange('height', parseInt(e.target.value))}
-            style={{ width: '100%' }}
-          />
-        </label>
-      </div>
+      <SliderControl
+        label="Height"
+        value={dimensions.height}
+        min={DIMENSION_LIMITS.height.min}
+        max={DIMENSION_LIMITS.height.max}
+        unit="cm"
+        onChange={(value) => handleSliderChange('height', value)}
+      />
 
-      <button onClick={resetToDefault} style={{ padding: '10px 20px' }}>
-        기본값으로 리셋
+      <button 
+        onClick={resetToDefault} 
+        className="btn-secondary"
+        style={{ width: '100%', marginTop: 'var(--spacing-md)' }}
+      >
+        Reset to Default
       </button>
     </div>
   );
