@@ -3,15 +3,15 @@
 ## 프로젝트 개요
 
 ### 프로젝트명
-250909-desk - DXF 기반 책상 빌더 웹 애플리케이션
+250909-desk - 3D 가구 모델링 빌더 웹 애플리케이션
 
 ### 목표
-사용자가 폭(Width), 깊이(Depth), 높이(Height)를 조정하여 4개 다리를 가진 책상을 실시간으로 설계할 수 있는 웹 기반 컨피규레이터 제작
+사용자가 폭(Width), 깊이(Depth), 높이(Height)를 조정하여 4개 다리를 가진 책상을 실시간 3D로 모델링하고 다양한 형태로 내보낼 수 있는 웹 기반 가구 컨피규레이터 제작
 
 ### 핵심 비전
-- 오토캐드/스케치업과 같은 전문 CAD 소프트웨어의 선형 표현 방식을 웹에서 구현
-- DXF 표준을 활용한 정확한 도면 생성 및 표시
-- 직관적인 UI/UX를 통한 실시간 치수 조정
+- **실시간 3D 모델링**: 웹 브라우저에서 바로 3D 가구 확인
+- **GLB/GLTF 내보내기**: Blender, Unity, 3D 프린팅에서 활용 가능
+- **직관적인 3D 인터랙션**: 회전, 줌, 팬으로 모든 각도 확인
 
 ## 기술 스택
 
@@ -20,10 +20,11 @@
 - **TypeScript** (타입 안정성)
 - **CSS Modules** (스타일과 로직 분리)
 
-### DXF 처리
-- **@tarikjabiri/dxf** - DXF 파일 생성
-- **dxf-parser** - DXF 파싱
-- **dxf-viewer** - DXF 뷰어 기능
+### 3D 모델링 & 렌더링
+- **Three.js** - 웹 3D 렌더링 엔진
+- **@react-three/fiber** - React용 Three.js 래퍼
+- **@react-three/drei** - 3D 컴포넌트 라이브러리
+- **GLTFExporter** - GLB/GLTF 파일 내보내기
 
 ### 개발 환경
 - **ESLint** - 코드 품질 관리
@@ -44,36 +45,38 @@
 - 숫자 직접 입력 (선택사항)
 - 단위: cm 고정
 
-### 2. 다중 뷰포트 시스템
-#### 2.1 3가지 뷰 제공
-1. **Top View (상부 뷰)**
-   - 책상을 위에서 내려다본 평면도
-   - 상판의 직사각형과 4개 다리의 위치 표시
+### 2. 3D 뷰어 시스템
+#### 2.1 실시간 3D 렌더링
+1. **3D 모델 생성**
+   - 상판: 직육면체 (BoxGeometry)
+   - 다리 4개: 원기둥 (CylinderGeometry)
+   - 실시간 기하학적 변환
    
-2. **Front View (정면 뷰)**
-   - 책상의 정면도
-   - 높이와 폭, 다리 구조 표시
+2. **카메라 컨트롤**
+   - 궤도 회전 (OrbitControls)
+   - 줌 인/아웃
+   - 팬(이동) 기능
    
-3. **Side View (측면 뷰)**
-   - 책상의 측면도
-   - 깊이와 높이, 다리 구조 표시
+3. **조명 시스템**
+   - 환경광 (AmbientLight)
+   - 방향광 (DirectionalLight)
+   - 그림자 효과
 
-#### 2.2 뷰포트 특징
-- 각 뷰포트는 독립적인 DXF 렌더링
-- 동시에 모든 뷰 표시
-- 치수 변경 시 실시간 업데이트
+#### 2.2 3D 뷰어 특징
+- WebGL 기반 하드웨어 가속
+- 60fps 부드러운 인터랙션
+- 치수 변경 시 실시간 3D 모델 업데이트
 
-### 3. DXF 기반 렌더링
-#### 3.1 도면 스타일
-- 선형(라인) 표현만 사용
-- 면(Face) 렌더링 없음
-- 검은색 선, 흰색/회색 배경
-- 오토캐드/스케치업 스타일 모방
+### 3. GLB 내보내기 시스템
+#### 3.1 3D 모델 구조
+- **상판**: 실제 두께를 가진 직육면체
+- **다리 4개**: 원기둥 형태 (지름 5cm)
+- **재질**: PBR 표준 재질 (Metalness/Roughness)
 
-#### 3.2 책상 구조 표현
-- **상판**: 직사각형 라인
-- **다리 4개**: 원형 또는 사각형 라인 (상판 모서리 근처)
-- **연결부**: 필요시 다리와 상판 연결선
+#### 3.2 내보내기 기능
+- **GLB 포맷**: 압축된 바이너리 GLTF
+- **호환성**: Blender, Unity, UE5, 3D 프린팅
+- **메타데이터**: 치수 정보 포함
 
 ## UI/UX 디자인
 
@@ -82,14 +85,12 @@
 ┌─────────────────┬─────────────────────────────┐
 │                 │        Desk Dimensions      │
 │                 │                             │
-│     Top View    │   Width  [====o===] 120cm  │
-│                 │   Depth  [===o====] 60cm   │
-│                 │   Height [===o====] 75cm   │
-├─────────────────┤                             │
-│   Front View    │   [Reset to Default]        │
+│                 │   Width  [====o===] 120cm  │
+│   3D Viewer     │   Depth  [===o====] 60cm   │
+│  (Interactive)  │   Height [===o====] 75cm   │
 │                 │                             │
-├─────────────────┤                             │
-│   Side View     │                             │
+│  🔄 회전 가능   │   [Reset to Default]        │
+│  🔍 줌 인/아웃  │   [Download GLB]            │
 │                 │                             │
 └─────────────────┴─────────────────────────────┘
 ```
@@ -138,12 +139,34 @@ src/
 
 ## 기술적 구현 세부사항
 
-### 1. DXF 생성 로직
+### 1. DXF 생성 로직 (CAD 표준 준수)
 ```typescript
 // utils/dxfGenerator.ts
-export function generateTopView(width: number, depth: number): string
-export function generateFrontView(width: number, height: number): string  
-export function generateSideView(depth: number, height: number): string
+import { DxfWriter } from '@tarikjabiri/dxf';
+
+export function generateTopViewDXF(dimensions: DeskDimensions): string {
+  const writer = new DxfWriter();
+  // LINE 엔티티로 상판 테두리
+  // CIRCLE 엔티티로 4개 다리
+  return writer.stringify(); // 표준 DXF 포맷
+}
+
+export function generateFrontViewDXF(dimensions: DeskDimensions): string
+export function generateSideViewDXF(dimensions: DeskDimensions): string
+```
+
+### 2. DXF 파싱 & 렌더링 로직
+```typescript
+// components/DxfViewer.tsx
+import DxfParser from 'dxf-parser';
+
+export function DxfViewer({ dxfContent }: { dxfContent: string }) {
+  // 1. dxf-parser로 엔티티 추출
+  const parsed = parser.parse(dxfContent);
+  
+  // 2. dxf-viewer 또는 Canvas로 엔티티 렌더링
+  // 3. 웹에서 보이는 것 = CAD에서 import되는 것 보장
+}
 ```
 
 ### 2. 상태 관리
@@ -155,10 +178,19 @@ interface DeskDimensions {
 }
 ```
 
-### 3. DXF 뷰어 통합
-- @tarikjabiri/dxf로 DXF 생성
-- dxf-viewer로 웹에서 렌더링
-- Canvas 또는 SVG 기반 표시
+### 3. DXF 워크플로우 (CAD 연동 보장)
+```
+[치수 입력] → [@tarikjabiri/dxf] → [표준 DXF 생성] 
+      ↓
+[dxf-parser] → [엔티티 파싱] → [dxf-viewer] → [웹 렌더링]
+      ↓
+[DXF 다운로드] → [AutoCAD/SketchUp에서 정상 import]
+```
+
+**핵심 원칙:**
+- 웹에서 보이는 것 = CAD에서 import되는 것
+- Canvas 직접 그리기 금지 (DXF 엔티티만 사용)
+- 실제 DXF 파싱을 통한 렌더링으로 검증
 
 ## 성능 요구사항
 
@@ -183,8 +215,9 @@ interface DeskDimensions {
 - 3D 뷰 추가
 
 ### Phase 3 기능
-- DXF 파일 다운로드
-- 치수 표기 추가
+- **DXF 파일 다운로드** - 표준 .dxf 파일로 내보내기
+- **CAD 호환성 테스트** - AutoCAD, SketchUp 등에서 검증
+- 치수 표기 추가 (DIMENSION 엔티티)
 - 견적 계산 기능
 
 ## 개발 일정
@@ -195,14 +228,14 @@ interface DeskDimensions {
 - [ ] 기본 컴포넌트 구조 작성
 
 ### Week 2
-- [ ] 뷰포트 시스템 구현
-- [ ] 컨트롤 패널 UI 개발
-- [ ] CSS 모듈 스타일링
+- [ ] **DXF 파싱 로직 구현** - dxf-parser 연동
+- [ ] **실제 DXF 렌더링** - dxf-viewer 또는 Canvas 엔티티 렌더링
+- [ ] **CAD 호환성 1차 검증** - 생성된 DXF 파일 테스트
 
 ### Week 3
-- [ ] DXF 뷰어 통합
-- [ ] 실시간 업데이트 로직
-- [ ] 반응형 디자인
+- [ ] 3개 뷰포트 시스템 구현
+- [ ] **DXF 다운로드 기능** 구현
+- [ ] **CAD 소프트웨어 호환성 테스트**
 
 ### Week 4
 - [ ] 테스트 및 버그 수정
