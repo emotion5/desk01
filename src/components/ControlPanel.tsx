@@ -71,7 +71,11 @@ export default function ControlPanel({ dimensions, onDimensionChange }: ControlP
   };
 
   return (
-    <div className="glass-card-elevated" style={{ padding: 'var(--spacing-xl)' }}>
+    <div style={{
+      padding: 'var(--spacing-xl)',
+      background: 'var(--color-surface-elevated)',
+      border: '1px solid var(--color-border)'
+    }}>
       <h2 className="title-medium" style={{ marginBottom: 'var(--spacing-lg)' }}>
         Customize Your Desk
       </h2>
