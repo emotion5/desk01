@@ -1,1 +1,6 @@
 @import '../styles/apple-design.css';
+
+/* Hide Next.js development tools button */
+[data-nextjs-dev-tools-button="true"] {
+  display: none !important;
+}

@@ -74,7 +74,10 @@ export default function ControlPanel({ dimensions, onDimensionChange }: ControlP
     <div style={{
       padding: 'var(--spacing-xl)',
       background: 'var(--color-surface-elevated)',
-      border: '1px solid var(--color-border)'
+      border: '1px solid var(--color-border)',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       <h2 className="title-medium" style={{ marginBottom: 'var(--spacing-lg)' }}>
         Customize Your Desk
@@ -107,13 +110,15 @@ export default function ControlPanel({ dimensions, onDimensionChange }: ControlP
         onChange={(value) => handleSliderChange('height', value)}
       />
 
-      <button 
-        onClick={resetToDefault} 
-        className="btn-secondary"
-        style={{ width: '100%', marginTop: 'var(--spacing-md)' }}
-      >
-        Reset to Default
-      </button>
+      <div style={{ marginTop: 'auto' }}>
+        <button
+          onClick={resetToDefault}
+          className="btn-secondary"
+          style={{ width: '100%', marginTop: 'var(--spacing-md)', borderRadius: '0' }}
+        >
+          Reset to Default
+        </button>
+      </div>
     </div>
   );
 }

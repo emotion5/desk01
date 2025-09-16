@@ -13,7 +13,8 @@ export default function DeskBuilder() {
       display: 'grid',
       gridTemplateColumns: '2fr 1fr',
       gap: 'var(--spacing-2xl)',
-      alignItems: 'start'
+      alignItems: 'stretch',
+      minHeight: '600px'
     }}>
       <ThreeDViewer dimensions={dimensions} />
       <ControlPanel

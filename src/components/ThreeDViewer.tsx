@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useState, useEffect } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Box, Cylinder, Edges, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { DeskDimensions } from '@/types';
-import { exportToGLB } from '@/utils/glbExporter';
 
 interface ThreeDViewerProps {
   dimensions: DeskDimensions;
@@ -109,16 +108,36 @@ function DeskModel({ dimensions, viewMode }: { dimensions: DeskDimensions; viewM
   );
 }
 
+function CameraController({ cameraMode }: { cameraMode: 'perspective' | 'orthographic' }) {
+  const { camera, gl, set } = useThree();
+
+  useEffect(() => {
+    if (cameraMode === 'orthographic') {
+      const orthographicCamera = new THREE.OrthographicCamera(
+        -100, // left
+        100,  // right
+        100,  // top
+        -100, // bottom
+        0.1,  // near
+        1000  // far
+      );
+      orthographicCamera.position.set(150, 100, 150);
+      orthographicCamera.lookAt(0, 0, 0);
+      set({ camera: orthographicCamera });
+    } else {
+      const perspectiveCamera = new THREE.PerspectiveCamera(50, gl.domElement.width / gl.domElement.height, 0.1, 1000);
+      perspectiveCamera.position.set(150, 100, 150);
+      perspectiveCamera.lookAt(0, 0, 0);
+      set({ camera: perspectiveCamera });
+    }
+  }, [cameraMode, gl, set]);
+
+  return null;
+}
+
 export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
   const [viewMode, setViewMode] = useState<'solid' | 'line'>('solid');
-
-  const handleExportGLB = async () => {
-    try {
-      await exportToGLB(dimensions);
-    } catch (error) {
-      alert('GLB 내보내기에 실패했습니다: ' + (error as Error).message);
-    }
-  };
+  const [cameraMode, setCameraMode] = useState<'perspective' | 'orthographic'>('perspective');
 
   return (
     <div style={{
@@ -134,32 +153,83 @@ export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
         background: 'var(--color-surface-elevated)',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'flex-start',
+        minHeight: '60px',
+        flexShrink: 0
       }}>
         <div>
           <h3 className="title-medium" style={{ marginBottom: 'var(--spacing-xs)' }}>
-            3D Preview
+            Live Preview
           </h3>
           <p className="caption">
-            {dimensions.width} × {dimensions.depth} × {dimensions.height} cm
+            Design your perfect desk with real-time 3D visualization
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
-          <button
-            onClick={() => setViewMode('solid')}
-            className={viewMode === 'solid' ? 'btn-primary' : 'btn-secondary'}
-            style={{ fontSize: '12px', padding: '6px 12px' }}
-          >
-            Solid
-          </button>
-          <button
-            onClick={() => setViewMode('line')}
-            className={viewMode === 'line' ? 'btn-primary' : 'btn-secondary'}
-            style={{ fontSize: '12px', padding: '6px 12px' }}
-          >
-            Line
-          </button>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--spacing-sm)',
+          alignItems: 'flex-end',
+          minWidth: '200px'
+        }}>
+          <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
+            <button
+              onClick={() => setViewMode('solid')}
+              className={viewMode === 'solid' ? 'btn-primary' : 'btn-secondary'}
+              style={{
+                fontSize: '12px',
+                padding: '6px 12px',
+                borderRadius: '0',
+                width: '140px',
+                height: '28px'
+              }}
+            >
+              Solid
+            </button>
+            <button
+              onClick={() => setViewMode('line')}
+              className={viewMode === 'line' ? 'btn-primary' : 'btn-secondary'}
+              style={{
+                fontSize: '12px',
+                padding: '6px 12px',
+                borderRadius: '0',
+                width: '140px',
+                height: '28px'
+              }}
+            >
+              Line
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
+            <button
+              onClick={() => setCameraMode('perspective')}
+              className={cameraMode === 'perspective' ? 'btn-primary' : 'btn-secondary'}
+              style={{
+                fontSize: '12px',
+                padding: '6px 12px',
+                borderRadius: '0',
+                width: '140px',
+                height: '28px'
+              }}
+            >
+              Perspective
+            </button>
+            <button
+              onClick={() => setCameraMode('orthographic')}
+              className={cameraMode === 'orthographic' ? 'btn-primary' : 'btn-secondary'}
+              style={{
+                fontSize: '12px',
+                padding: '6px 12px',
+                borderRadius: '0',
+                width: '140px',
+                height: '28px'
+              }}
+            >
+              Orthographic
+            </button>
+          </div>
         </div>
       </div>
       
@@ -169,11 +239,11 @@ export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
         background: '#606060',
         position: 'relative'
       }}>
-        <Canvas 
+        <Canvas
           camera={{ position: [150, 100, 150], fov: 50 }}
         >
-          {/* 실내 저녁 환경광 */}
-          <Environment preset="apartment" />
+          {/* HDRI 환경광 및 배경 */}
+          <Environment files="/hdri/studio.hdr" background />
           <ambientLight intensity={0.2} />
           <directionalLight
             position={[50, 80, 30]}
@@ -186,9 +256,12 @@ export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
           <pointLight position={[30, 40, 30]} intensity={0.4} color="#ffb366" />
           <pointLight position={[-30, 40, -30]} intensity={0.3} color="#ffd4a3" />
           
+          {/* 카메라 컨트롤러 */}
+          <CameraController cameraMode={cameraMode} />
+
           {/* 3D 책상 모델 */}
           <DeskModel dimensions={dimensions} viewMode={viewMode} />
-          
+
           {/* 카메라 컨트롤 */}
           <OrbitControls
             enablePan={true}
