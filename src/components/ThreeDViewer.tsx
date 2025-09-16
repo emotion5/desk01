@@ -10,28 +10,6 @@ interface ThreeDViewerProps {
   dimensions: DeskDimensions;
 }
 
-function AxisHelper() {
-  const axisLength = 50;
-
-  return (
-    <group>
-      {/* X축 - 빨강 */}
-      <Box args={[axisLength, 0.5, 0.5]} position={[axisLength/2, 0, 0]}>
-        <meshStandardMaterial color="#ff0000" />
-      </Box>
-
-      {/* Y축 - 초록 */}
-      <Box args={[0.5, axisLength, 0.5]} position={[0, axisLength/2, 0]}>
-        <meshStandardMaterial color="#00ff00" />
-      </Box>
-
-      {/* Z축 - 파랑 */}
-      <Box args={[0.5, 0.5, axisLength]} position={[0, 0, axisLength/2]}>
-        <meshStandardMaterial color="#0000ff" />
-      </Box>
-    </group>
-  );
-}
 
 function DeskModel({ dimensions, viewMode }: { dimensions: DeskDimensions; viewMode: 'solid' | 'line' }) {
   const { width, depth, height } = dimensions;
@@ -57,8 +35,6 @@ function DeskModel({ dimensions, viewMode }: { dimensions: DeskDimensions; viewM
 
   return (
     <group>
-      {/* 좌표축 */}
-      <AxisHelper />
 
       {/* 상판 */}
       <Box
