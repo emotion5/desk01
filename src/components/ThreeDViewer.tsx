@@ -85,7 +85,7 @@ function DeskModel({ dimensions, viewMode }: { dimensions: DeskDimensions; viewM
 }
 
 function CameraController({ cameraMode }: { cameraMode: 'perspective' | 'orthographic' }) {
-  const { camera, gl, set } = useThree();
+  const { gl, set } = useThree();
 
   useEffect(() => {
     if (cameraMode === 'orthographic') {
@@ -219,7 +219,7 @@ export default function ThreeDViewer({ dimensions }: ThreeDViewerProps) {
           camera={{ position: [150, 100, 150], fov: 50 }}
         >
           {/* HDRI 환경광 및 배경 */}
-          <Environment files="/hdri/studio.hdr" background />
+          <Environment files="/hdri/studio.hdr" background={cameraMode === 'perspective'} />
           <ambientLight intensity={0.2} />
           <directionalLight
             position={[50, 80, 30]}
